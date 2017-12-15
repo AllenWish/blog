@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<context:component-scan base-package="com.awsoft.blog.controller" />
+	<mvc:resources location="/static/" mapping="/static/**"/>
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/webpage/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+
+
+	<!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射， 配置一个基于注解的定制的WebBindingInitializer，解决日期转换问题，方法级别的处理器映射 -->
+    <!-- 启动SpringMVC的注解功能，完成请求和注解POJO的映射 -->
+    <bean
+            class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+    </bean>
+    <!--<bean
+            class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="cacheSeconds" value="0" />
+        <property name="messageConverters">
+            <list>
+                <ref bean="mappingJacksonHttpMessageConverter" />&lt;!&ndash; json转换器 &ndash;&gt;
+            </list>
+        </property>
+    </bean>-->
+    <!-- 避免IE执行AJAX时,返回JSON出现下载文件 -->
+    <bean id="mappingJacksonHttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/html;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+    <!-- 配置返回Json数据 -->
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="mappingJacksonHttpMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 特别重要，不配置该项,使用ajax请求时会报406错误 -->
+    <mvc:annotation-driven></mvc:annotation-driven>
+
+    <bean id="multipartResolver"
+		  class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+		  p:defaultEncoding="UTF-8">
+		<property name="maxUploadSize">
+			<value>104857600</value>
+		</property>
+		<property name="maxInMemorySize">
+			<value>4096</value>
+		</property>
+	</bean>
+	<!-- Bean解析器,级别高于默认解析器,寻找bean对象进行二次处理 -->
+	<bean id="beanNameViewResolver"
+		  class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="0">
+	</bean>
+
+	<!-- 定义一个全局异常处理类 -->
+	<bean id="exceptionHandlerExceptionResolver"
+		  class="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver">
+	</bean>
+	<bean class="com.awsoft.core.exceptions.CustomExceptionResolver"/>
+
+	<!-- 添加拦截器 -->
+	<mvc:interceptors>
+
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.awsoft.core.intercepter.EncodingInterceptor" />
+		</mvc:interceptor>
+        <mvc:interceptor>
+			<mvc:mapping path="/**" />
+            <mvc:exclude-mapping path="/static/**"/>
+            <bean class="com.awsoft.core.intercepter.MyInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/user/**" />
+			<mvc:mapping path="/blog/**" />
+			<mvc:exclude-mapping path="/blog/all"/>
+			<mvc:exclude-mapping path="/blog/detail/**"/>
+            <bean class="com.awsoft.core.intercepter.LoginInterceptor" />
+                <!--<property name="excludeUrls">
+                    <list>
+                       <value>loginController.do?goPwdInit</value>
+                    </list>
+                </property>
+            </bean>-->
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+</beans>
+
+

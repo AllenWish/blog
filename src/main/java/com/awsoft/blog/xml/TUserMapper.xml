@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.awsoft.blog.dao.TUserMapper" >
+  <resultMap id="BaseResultMap" type="TUser" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="user_sign" property="userSign" jdbcType="VARCHAR" />
+    <result column="head_img" property="headImg" jdbcType="VARCHAR" />
+    <result column="integral" property="integral" jdbcType="VARCHAR" />
+    <result column="blogger_id" property="bloggerId" jdbcType="INTEGER" />
+  </resultMap>
+    <sql id="select_sql">
+        id, username, nick_name, password, sex, phone, email, user_sign, head_img,
+    integral, blogger_id
+    </sql>
+    <!--like CONCAT('%',#{name},'%')-->
+    <sql id="where_condition">
+        <where>
+            <if test="id!=null and id!=''">
+                and id = #{id}
+            </if>
+            <if test="username!=null and username!=''">
+                and username like concat('%',#{username},'%')
+            </if>
+            <if test="nickName!=null and nickName!=''">
+                and nick_name like concat('%',#{nickName},'%')
+            </if>
+            <if test="password!=null and password!=''">
+                and password = #{password}
+            </if>
+            <if test="sex!=null and sex!=''">
+                and sex = #{sex}
+            </if>
+            <if test="phone!=null and phone!=''">
+                and phone = #{phone}
+            </if>
+            <if test="email!=null and email!=''">
+                and email = #{email}
+            </if>
+            <if test="userSign!=null and userSign!=''">
+                and user_sign = #{userSign}
+            </if>
+            <if test="integral!=null and integral!=''">
+                and integral = #{integral}
+            </if>
+            <if test="bloggerId!=null and bloggerId!=''">
+                and blogger_id = #{bloggerId}
+            </if>
+        </where>
+    </sql>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.awsoft.blog.entity.TUser" >
+    insert into t_user ( username, nick_name,
+      password, sex, phone, 
+      email, user_sign, head_img, 
+      integral, blogger_id)
+    values ( #{username,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR},
+      #{password,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{email,jdbcType=VARCHAR}, '这个人是个懒鬼，不曾留下什么痕迹', #{headImg,jdbcType=VARCHAR},
+      '0', #{bloggerId,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.awsoft.blog.entity.TUser" >
+    update t_user
+    set username = #{username,jdbcType=VARCHAR},
+      nick_name = #{nickName,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      user_sign = #{userSign,jdbcType=VARCHAR},
+      head_img = #{headImg,jdbcType=VARCHAR},
+      integral = #{integral,jdbcType=VARCHAR},
+      blogger_id = #{bloggerId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+      <include refid="select_sql"/>
+    from t_user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select
+      <include refid="select_sql"/>
+    from t_user
+  </select>
+  <select id="getUser" resultMap="BaseResultMap" parameterType="TUser">
+    select
+      <include refid="select_sql"/>
+    from t_user
+    <include refid="where_condition"/>
+  </select>
+  <select id="dologin" resultMap="BaseResultMap" parameterType="TUser">
+    select
+      <include refid="select_sql"/>
+    from t_user
+    WHERE
+      nick_name = #{nickName} and password = #{password}
+  </select>
+</mapper>

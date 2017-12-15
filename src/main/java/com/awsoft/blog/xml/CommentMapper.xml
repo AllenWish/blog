@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.awsoft.blog.dao.CommentMapper" >
+  <resultMap id="BaseResultMap" type="com.awsoft.blog.entity.Comment" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="userIp" property="userip" jdbcType="VARCHAR" />
+    <result column="blogId" property="blogid" jdbcType="INTEGER" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="commentDate" property="commentdate" jdbcType="TIMESTAMP" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_comment
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.awsoft.blog.entity.Comment" >
+    insert into t_comment ( userIp, blogId,
+      content, commentDate, state
+      )
+    values ( #{userip,jdbcType=VARCHAR}, #{blogid,jdbcType=INTEGER},
+      #{content,jdbcType=VARCHAR}, now(), 1
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.awsoft.blog.entity.Comment" >
+    update t_comment
+    set userIp = #{userip,jdbcType=VARCHAR},
+      blogId = #{blogid,jdbcType=INTEGER},
+      content = #{content,jdbcType=VARCHAR},
+      commentDate = #{commentdate,jdbcType=TIMESTAMP},
+      state = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select id, userIp, blogId, content, commentDate, state
+    from t_comment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, userIp, blogId, content, commentDate, state
+    from t_comment
+  </select>
+  <select id="getByBlog" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select id, userIp, blogId, content, commentDate, state
+    from t_comment
+    where
+    blogId = #{blogid,jdbcType=INTEGER}
+  </select>
+</mapper>

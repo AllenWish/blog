@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.awsoft.blog.dao.BlogMapper" >
+  <resultMap id="BaseResultMap" type="com.awsoft.blog.entity.Blog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="summary" property="summary" jdbcType="VARCHAR" />
+    <result column="releaseDate" property="releasedate" jdbcType="TIMESTAMP" />
+    <result column="clickHit" property="clickhit" jdbcType="INTEGER" />
+    <result column="replyHit" property="replyhit" jdbcType="INTEGER" />
+    <result column="blogger" property="blogger" jdbcType="INTEGER" />
+    <result column="typeId" property="typeid" jdbcType="INTEGER" />
+    <result column="keyWord" property="keyword" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="select_sql">
+    id, title, summary, releaseDate, clickHit, replyHit, typeId, keyWord, content,blogger
+  </sql>
+    <sql id="nowhere_condeition">
+        <if test="id!=null and id!=''">
+            and id = #{id}
+        </if>
+        <if test="blogger!=null and blogger!=''">
+            and blogger = #{blogger}
+        </if>
+        <if test="title!=null and title!=''">
+            and title like concat('%',#{title},'%')
+        </if>
+        <if test="summary!=null and summary!=''">
+            and summary like concat('%',#{summary},'%')
+        </if>
+        <if test="keyword!=null and keyword!=''">
+            and keyWord like concat('%',#{keyword},'%')
+        </if>
+        <if test="content!=null and content!=''">
+            and content like concat('%',#{content},'%')
+        </if>
+        <if test="typeid!=null and typeid!=''">
+            and typeId = #{typeid}
+        </if>
+    </sql>
+  <sql id="where_condition">
+    <where>
+      <if test="id!=null and id!=''">
+        and id = #{id}
+      </if>
+      <if test="blogger!=null and blogger!=''">
+        and blogger = #{blogger}
+      </if>
+      <if test="title!=null and title!=''">
+        and title like concat('%',#{title},'%')
+      </if>
+      <if test="summary!=null and summary!=''">
+        and summary like concat('%',#{summary},'%')
+      </if>
+      <if test="keyword!=null and keyword!=''">
+        and keyWord like concat('%',#{keyword},'%')
+      </if>
+      <if test="content!=null and content!=''">
+        and content like concat('%',#{content},'%')
+      </if>
+      <if test="typeid!=null and typeid!=''">
+        and typeId = #{typeid}
+      </if>
+    </where>
+  </sql>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_blog
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="Blog" useGeneratedKeys="true" keyProperty="id">
+    insert into t_blog ( blogger,title, summary,
+      releaseDate, clickHit, replyHit, 
+      typeId, keyWord, content
+      )
+    values ( #{blogger,jdbcType=INTEGER},#{title,jdbcType=VARCHAR}, #{summary,jdbcType=VARCHAR},
+      now(), 0, 0,
+      #{typeid,jdbcType=INTEGER}, #{keyword,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="Blog" >
+    update t_blog
+    set title = #{title,jdbcType=VARCHAR},
+      summary = #{summary,jdbcType=VARCHAR},
+      releaseDate = #{releasedate,jdbcType=TIMESTAMP},
+      clickHit = #{clickhit,jdbcType=INTEGER},
+      replyHit = #{replyhit,jdbcType=INTEGER},
+      typeId = #{typeid,jdbcType=INTEGER},
+      keyWord = #{keyword,jdbcType=VARCHAR},
+      content = #{content,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="select_sql"/>
+    from t_blog
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select  <include refid="select_sql"/>
+    from t_blog
+  </select>
+  <select id="selectBlog" resultMap="BaseResultMap" parameterType="Blog">
+    select
+    <include refid="select_sql"/>
+    from t_blog
+    <include refid="where_condition"/>
+
+  </select>
+    <select id="getBlog" resultType="java.util.Map" parameterType="java.util.Map">
+        select
+        b.id, title, summary, releaseDate, clickHit, replyHit, typeId, keyWord, content,blogger
+        userName, nickName, sign, imageName, profile,
+        typeName
+        from t_blog b
+        LEFT JOIN t_blogger br on b.blogger = br.id
+        LEFT JOIN t_blogtype bt on b.typeId = bt.id
+        where 1=1
+        <include refid="nowhere_condeition"/>
+        <if test="nickName!=null and nickName!=''">
+            and nickName like concat('%',#{nickName} ,'%')
+        </if>
+        ORDER BY
+        <choose>
+            <when test="sort!=null">
+                ${sort}
+                <if test="order!=null">
+                    ${order}
+                </if>
+            </when>
+            <otherwise>
+                id asc
+            </otherwise>
+        </choose>
+    </select>
+</mapper>
