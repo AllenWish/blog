@@ -40,7 +40,7 @@ public class LoginController {
 
     @RequestMapping("/login")
     @ResponseBody
-    public AjaxAndJson login(TUser user,
+    public Map<String,Object> login(TUser user,
                              HttpServletRequest request, HttpServletResponse response){
         Map<String,Object> retMap = new HashMap<>();
         AjaxAndJson aj = new AjaxAndJson();
@@ -60,7 +60,7 @@ public class LoginController {
 
         }
         aj.setData(retMap);
-        return aj;
+        return retMap;
     }
 
 

@@ -118,7 +118,8 @@
                 data:data.field,
                 dataType:'json',
                 success:function(data){
-                    data = data.data;
+                    console.info(data)
+                    data = data;
                     if(data.flag){
                         //location.reload()
                         window.location.href='/index'
